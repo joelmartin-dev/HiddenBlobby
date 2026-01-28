@@ -68,6 +68,7 @@ public class EnemyController : MonoBehaviour
         if (frame != turn) return;
         if (is_chasing)
         {
+            if (agent.remainingDistance < 0.2f) ;
             if (Physics.Raycast(transform.position, player.transform.position - transform.position, out RaycastHit hit, 1000.0f))
             {
                 if (!hit.collider.CompareTag("Player"))

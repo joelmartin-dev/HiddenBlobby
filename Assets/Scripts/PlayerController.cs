@@ -15,6 +15,7 @@ public class PlayerController : MonoBehaviour
     private Vector3 velocity;
     [SerializeField]
     private float move_speed;
+    private float move_speed_mod;
     [SerializeField]
     private float look_speed;
     public bool masked;
@@ -28,6 +29,7 @@ public class PlayerController : MonoBehaviour
         animator = view_model.GetComponent<Animator>();
         is_moving_param_index = Animator.StringToHash("IsMoving");
         cam = Camera.main;
+        move_speed_mod = 1.0f;
 
         // Disable controller, teleport, re-enable controller
         controller.enabled = false;
@@ -41,7 +43,8 @@ public class PlayerController : MonoBehaviour
     public void OnMove(InputAction.CallbackContext context)
     {
         var input_value = context.ReadValue<Vector2>();
-        velocity = new Vector3(input_value.x, 0.0f, input_value.y) * move_speed;
+        velocity = new Vector3(input_value.x, 0.0f, input_value.y);
+        if (velocity.magnitude > 1.0f) velocity = velocity.normalized;
     }
 
     public void OnInteract(InputAction.CallbackContext context)
@@ -54,10 +57,12 @@ public class PlayerController : MonoBehaviour
             {
                 if (enemy.can_see_player) enemy.knows_player_masked = true;
             }
+            move_speed_mod = 0.1f;
         }
         else
         {
             masked = false;
+            move_speed_mod = 1.0f;
         }
         Debug.Log("Interact: " + input_value);
     }
@@ -87,7 +92,7 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        controller.Move(velocity * Time.deltaTime); 
+        controller.Move(velocity * move_speed * move_speed_mod * Time.deltaTime); 
         if (velocity != Vector3.zero)
         {
             Quaternion toRotation = Quaternion.LookRotation(velocity, Vector3.up);
