@@ -6,6 +6,12 @@ TagManager:
   tags:
   - PlayerStart
   - PlayerViewModel
+  - Destination
+  - Near_Cone
+  - Mid_Cone
+  - Far_Cone
+  - Very_Far_Cone
+  - Wall
   layers:
   - Default
   - TransparentFX

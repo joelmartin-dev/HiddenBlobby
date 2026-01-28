@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
@@ -44,6 +45,39 @@ public class PlayerController : MonoBehaviour
     {
         var input_value = context.ReadValueAsButton();
         Debug.Log("Interact: " + input_value);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        var enemy_controller = other.GetComponentInParent<EnemyController>();
+        if (other.CompareTag("Near_Cone"))
+        {
+            enemy_controller.is_chasing = true;
+        }
+        else if (other.CompareTag("Mid_Cone"))
+        {
+            // if Near_Cone is unobstructed
+            if ((enemy_controller.cone_flags & ConeFlags.NEAR_CONE) != ConeFlags.NEAR_CONE)
+            {
+                enemy_controller.is_chasing = true;
+            }
+        }
+        else if (other.CompareTag("Far_Cone"))
+        {
+            // if Near_Cone and Mid_Cone are unobstructed
+            if ((enemy_controller.cone_flags & (ConeFlags.NEAR_CONE | ConeFlags.MID_CONE)) != (ConeFlags.NEAR_CONE | ConeFlags.MID_CONE))
+            {
+                enemy_controller.is_chasing = true;
+            }
+        }
+        else if (other.CompareTag("Very_Far_Cone"))
+        {
+            // if Near_Cone and Mid_Cone are unobstructed
+            if ((enemy_controller.cone_flags & (ConeFlags.NEAR_CONE | ConeFlags.MID_CONE | ConeFlags.FAR_CONE)) != (ConeFlags.NEAR_CONE | ConeFlags.MID_CONE | ConeFlags.FAR_CONE))
+            {
+                enemy_controller.is_chasing = true;
+            }
+        }
     }
 
     // Update is called once per frame
