@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.UI;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
@@ -16,6 +17,8 @@ public class PlayerController : MonoBehaviour
     private float move_speed;
     [SerializeField]
     private float look_speed;
+    public bool masked;
+    [SerializeField] public List<EnemyController> chasing_enemies;
     // Start is called before the first frame update
     void Start()
     {
@@ -44,38 +47,39 @@ public class PlayerController : MonoBehaviour
     public void OnInteract(InputAction.CallbackContext context)
     {
         var input_value = context.ReadValueAsButton();
+        if (input_value == true)
+        {
+            masked = true;
+            foreach (var enemy in chasing_enemies)
+            {
+                if (enemy.can_see_player) enemy.knows_player_masked = true;
+            }
+        }
+        else
+        {
+            masked = false;
+        }
         Debug.Log("Interact: " + input_value);
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        var enemy_controller = other.GetComponentInParent<EnemyController>();
-        if (other.CompareTag("Near_Cone"))
+        if (other.transform.parent.CompareTag("Enemy"))
         {
-            enemy_controller.is_chasing = true;
-        }
-        else if (other.CompareTag("Mid_Cone"))
-        {
-            // if Near_Cone is unobstructed
-            if ((enemy_controller.cone_flags & ConeFlags.NEAR_CONE) != ConeFlags.NEAR_CONE)
+            RaycastHit hit;
+            var enemy_controller = other.GetComponentInParent<EnemyController>();
+            if (Physics.Raycast(enemy_controller.transform.position, transform.position - enemy_controller.transform.position, out hit, 1000.0f))
             {
-                enemy_controller.is_chasing = true;
-            }
-        }
-        else if (other.CompareTag("Far_Cone"))
-        {
-            // if Near_Cone and Mid_Cone are unobstructed
-            if ((enemy_controller.cone_flags & (ConeFlags.NEAR_CONE | ConeFlags.MID_CONE)) != (ConeFlags.NEAR_CONE | ConeFlags.MID_CONE))
-            {
-                enemy_controller.is_chasing = true;
-            }
-        }
-        else if (other.CompareTag("Very_Far_Cone"))
-        {
-            // if Near_Cone and Mid_Cone are unobstructed
-            if ((enemy_controller.cone_flags & (ConeFlags.NEAR_CONE | ConeFlags.MID_CONE | ConeFlags.FAR_CONE)) != (ConeFlags.NEAR_CONE | ConeFlags.MID_CONE | ConeFlags.FAR_CONE))
-            {
-                enemy_controller.is_chasing = true;
+                if (hit.collider.CompareTag("Player"))
+                {
+                    enemy_controller.DetectedPlayer();
+                    if (!chasing_enemies.Contains(enemy_controller)) chasing_enemies.Add(enemy_controller);
+                    Debug.DrawLine(enemy_controller.transform.position, transform.position, Color.green, 10.0f);
+                }
+                else
+                {
+                    Debug.DrawLine(enemy_controller.transform.position, transform.position, Color.red, 10.0f);
+                }
             }
         }
     }
