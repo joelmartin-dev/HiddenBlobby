@@ -10,6 +10,7 @@ TagManager:
   - Wall
   - Enemy
   - Hedge
+  - Map
   layers:
   - Default
   - TransparentFX

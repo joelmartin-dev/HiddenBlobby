@@ -21,12 +21,15 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private float look_speed;
     public bool masked;
+    private Material player_mat;
     [SerializeField] public List<EnemyController> chasing_enemies;
     private Material grass_mat;
     [SerializeField] private Vector2 peephole_origin;
     private Vector2 peephole_target;
     [SerializeField] private float peephole_min_size;
     [SerializeField] private float max_lookahead;
+
+    private Renderer map_renderer;
     // Start is called before the first frame update
     void Start()
     {
@@ -50,6 +53,8 @@ public class PlayerController : MonoBehaviour
         grass_mat = GameObject.FindGameObjectWithTag("Hedge").GetComponent<Renderer>().sharedMaterial;
         peephole_target = peephole_origin;
         grass_mat.SetFloat("_Size", peephole_min_size);
+
+        map_renderer = GameObject.FindGameObjectWithTag("Map").GetComponent<Renderer>();
     }
 
     public void OnMove(InputAction.CallbackContext context)
@@ -84,6 +89,12 @@ public class PlayerController : MonoBehaviour
             move_speed_mod = 1.0f;
         }
         Debug.Log("Interact: " + input_value);
+    }
+
+    public void OnCheat(InputAction.CallbackContext context)
+    {
+        var input_value = context.ReadValueAsButton();
+        map_renderer.enabled = input_value;
     }
 
     private void OnTriggerEnter(Collider other)
