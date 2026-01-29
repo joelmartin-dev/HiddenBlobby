@@ -132,7 +132,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.5
-  m_Speed: 3.5
+  m_Speed: 8
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 360
@@ -143,7 +143,7 @@ NavMeshAgent:
   m_Height: 2
   m_BaseOffset: 1
   m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 4
+  m_ObstacleAvoidanceType: 1
 --- !u!114 &2085196690483395255
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -163,6 +163,8 @@ MonoBehaviour:
   knows_player_masked: 0
   max_wait_time: 5
   wait_time: 0
+  max_held_time: 3
+  held_time: 0
 --- !u!1 &5469513212231587913
 GameObject:
   m_ObjectHideFlags: 0

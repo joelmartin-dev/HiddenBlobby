@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.UI;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
@@ -99,6 +98,12 @@ public class PlayerController : MonoBehaviour
         map_renderer.enabled = input_value;
     }
 
+    public void OnCancel(InputAction.CallbackContext context)
+    {
+        var input_value = context.ReadValueAsButton();
+        if (input_value) Application.Quit();
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.transform.parent.CompareTag("Enemy"))
@@ -119,6 +124,11 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
+    }
+
+    public void Lose()
+    {
+        Debug.Log("Player loses");
     }
 
     // Update is called once per frame

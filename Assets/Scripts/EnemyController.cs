@@ -19,6 +19,8 @@ public class EnemyController : MonoBehaviour
     private int frame_modulo;
     [SerializeField] private float max_wait_time;
     [SerializeField] private float wait_time;
+    [SerializeField] private float max_held_time;
+    [SerializeField] private float held_time;
 
     // Start is called before the first frame update
     void Start()
@@ -53,6 +55,8 @@ public class EnemyController : MonoBehaviour
                 break;
             }
         }
+
+        held_time = max_held_time;
     }
 
     public void DetectedPlayer()
@@ -68,7 +72,12 @@ public class EnemyController : MonoBehaviour
         if (frame != turn) return;
         if (is_chasing)
         {
-            if (agent.remainingDistance < 0.2f) ;
+            if (agent.remainingDistance < 1.0f)
+            {
+                held_time -= Time.fixedDeltaTime * frame_modulo;
+                if (held_time < 0.0f) player.Lose();
+            }
+            else held_time = max_held_time;
             if (Physics.Raycast(transform.position, player.transform.position - transform.position, out RaycastHit hit, 1000.0f))
             {
                 if (!hit.collider.CompareTag("Player"))
@@ -88,21 +97,20 @@ public class EnemyController : MonoBehaviour
                 agent.destination = player.transform.position;
                 wait_time = max_wait_time;
             }
+            else
+            {
+                wait_time -= Time.fixedDeltaTime * frame_modulo;
+                if (wait_time < 0.0f)
+                {
+                    is_chasing = false;
+                    player.chasing_enemies.Remove(this);
+                }
+            }
         }
         else if (agent.remainingDistance < 0.2f)
         {
             agent.destination = to_point_a ? point_b : point_a;
             to_point_a = !to_point_a;
-        }
-    }
-
-    private void Update()
-    {
-        if (is_chasing && !can_see_player) wait_time -= Time.deltaTime;
-        if (wait_time < 0.0f)
-        {
-            is_chasing = false;
-            player.chasing_enemies.Remove(this);
         }
     }
 }
