@@ -165,7 +165,7 @@ MonoBehaviour:
   knows_player_masked: 0
   max_wait_time: 5
   wait_time: 0
-  max_held_time: 3
+  max_held_time: 5
   held_time: 0
 --- !u!1 &5469513212231587913
 GameObject:

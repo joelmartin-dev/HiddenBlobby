@@ -1,8 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UI;
 
 public class EnemyController : MonoBehaviour
 {
@@ -19,10 +21,10 @@ public class EnemyController : MonoBehaviour
     private int frame_modulo;
     [SerializeField] private float max_wait_time;
     [SerializeField] private float wait_time;
-    [SerializeField] private float max_held_time;
-    [SerializeField] private float held_time;
+    [SerializeField] public float max_held_time;
+    [SerializeField] public float held_time;
     private GameObject alert;
-    private GameObject question;
+    private GameObject question; 
 
     // Start is called before the first frame update
     void Start()
@@ -91,18 +93,13 @@ public class EnemyController : MonoBehaviour
         if (frame != turn) return;
         if (is_chasing)
         {
-            if (agent.remainingDistance < 1.0f)
-            {
-                held_time -= Time.fixedDeltaTime * frame_modulo;
-                if (held_time < 0.0f) player.Lose();
-            }
-            else held_time = max_held_time;
             if (Physics.Raycast(transform.position, player.transform.position - transform.position, out RaycastHit hit, 1000.0f))
             {
                 if (!hit.collider.CompareTag("Player"))
                 {
                     can_see_player = false;
                     knows_player_masked = false;
+                    held_time = max_held_time;
                     Debug.DrawLine(transform.position, player.transform.position, Color.yellow, 10.0f);
                 }
                 else if (!(!knows_player_masked && player.masked))
@@ -117,6 +114,12 @@ public class EnemyController : MonoBehaviour
                 question.transform.localScale = Vector3.Lerp(question.transform.localScale, Vector3.zero, 0.2f);
                 agent.destination = player.transform.position;
                 wait_time = max_wait_time;
+                if ((player.transform.position - transform.position).magnitude < 4.0f)
+                {
+                    held_time -= Time.fixedDeltaTime * frame_modulo;
+                    if (held_time < 0.0f) player.Lose();
+                }
+                else held_time = max_held_time;
             }
             else
             {
@@ -128,12 +131,16 @@ public class EnemyController : MonoBehaviour
                     is_chasing = false;
                     player.chasing_enemies.Remove(this);
                 }
+                held_time = max_held_time;
             }
+
+            
         }
         else
         {
             alert.transform.localScale = Vector3.Lerp(alert.transform.localScale, Vector3.zero, 0.2f);
             question.transform.localScale = Vector3.Lerp(question.transform.localScale, Vector3.zero, 0.2f);
+            held_time = max_held_time;
             if (agent.remainingDistance < 0.2f)
             {
                 agent.destination = to_point_a ? point_b : point_a;

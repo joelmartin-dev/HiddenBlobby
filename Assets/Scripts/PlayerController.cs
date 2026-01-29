@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 using UnityEngine.Splines;
 
 public class PlayerController : MonoBehaviour
@@ -29,6 +31,11 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float max_lookahead;
 
     private Renderer map_renderer;
+    private TMP_Text countdown;
+
+    private float flash_time;
+    private Material danger_mat;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -55,7 +62,15 @@ public class PlayerController : MonoBehaviour
 
         map_renderer = GameObject.FindGameObjectWithTag("Map").GetComponent<Renderer>();
 
-        player_mat = GetComponentInChildren<Renderer>().material;
+        var mats = GetComponentsInChildren<Renderer>();
+        foreach (var mat in mats)
+        {
+            if (!mat.CompareTag("DangerQuad")) player_mat = mat.material;
+        }
+        countdown = GameObject.FindGameObjectWithTag("Countdown").GetComponent<TMP_Text>();
+
+        flash_time = Mathf.PI;
+        danger_mat = GameObject.FindGameObjectWithTag("DangerQuad").GetComponent<Renderer>().material;
     }
 
     public void OnMove(InputAction.CallbackContext context)
@@ -106,6 +121,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        if (other.CompareTag("Win")) SceneManager.LoadScene(2);
         if (other.transform.parent.CompareTag("Enemy"))
         {
             RaycastHit hit;
@@ -129,6 +145,7 @@ public class PlayerController : MonoBehaviour
     public void Lose()
     {
         Debug.Log("Player loses");
+        SceneManager.LoadScene(1);
     }
 
     // Update is called once per frame
@@ -163,6 +180,33 @@ public class PlayerController : MonoBehaviour
             player_mat.SetFloat("_Mask", Mathf.Lerp(player_mat.GetFloat("_Mask"), 1.0f, 0.2f));
         }
         else player_mat.SetFloat("_Mask", Mathf.Lerp(player_mat.GetFloat("_Mask"), 0.0f, 0.2f));
+
+        if (chasing_enemies.Count > 0)
+        {
+            EnemyController lowest_held_time = chasing_enemies[0];
+            foreach (var enemy in chasing_enemies)
+            {
+                if (enemy.held_time < lowest_held_time.held_time) lowest_held_time = enemy;
+            }
+            if (lowest_held_time.held_time < lowest_held_time.max_held_time)
+            {
+                countdown.transform.parent.gameObject.SetActive(true);
+                countdown.text = lowest_held_time.held_time.ToString();
+                flash_time += Time.deltaTime * 1.0f;
+            }
+            else
+            {
+                countdown.transform.parent.gameObject.SetActive(false);
+                flash_time = Mathf.PI;
+            }
+        }
+        else
+        {
+            countdown.transform.parent.gameObject.SetActive(false);
+            flash_time = Mathf.PI;
+        }
+
+        danger_mat.SetFloat("_AlphaMod", (Mathf.Cos(flash_time * 5.0f) + 0.5f) * 0.2f);
     }
 
 }
