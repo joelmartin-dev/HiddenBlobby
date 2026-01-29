@@ -55,6 +55,8 @@ public class PlayerController : MonoBehaviour
         grass_mat.SetFloat("_Size", peephole_min_size);
 
         map_renderer = GameObject.FindGameObjectWithTag("Map").GetComponent<Renderer>();
+
+        player_mat = GetComponentInChildren<Renderer>().material;
     }
 
     public void OnMove(InputAction.CallbackContext context)
@@ -122,7 +124,7 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        controller.Move(velocity * move_speed * move_speed_mod * Time.deltaTime); 
+        controller.Move(velocity * move_speed * move_speed_mod * Time.deltaTime);
         if (velocity != Vector3.zero)
         {
             Quaternion toRotation = Quaternion.LookRotation(velocity, Vector3.up);
@@ -145,7 +147,12 @@ public class PlayerController : MonoBehaviour
             grass_mat.SetFloat("_Size", Mathf.Lerp(grass_mat.GetFloat("_Size"), peephole_min_size, 0.2f));
         }
 
-        if (masked) grass_mat.SetFloat("_Size", Mathf.Lerp(grass_mat.GetFloat("_Size"), 2.5f, 0.2f));
+        if (masked)
+        {
+            grass_mat.SetFloat("_Size", Mathf.Lerp(grass_mat.GetFloat("_Size"), 2.5f, 0.2f));
+            player_mat.SetFloat("_Mask", Mathf.Lerp(player_mat.GetFloat("_Mask"), 1.0f, 0.2f));
+        }
+        else player_mat.SetFloat("_Mask", Mathf.Lerp(player_mat.GetFloat("_Mask"), 0.0f, 0.2f));
     }
 
 }
