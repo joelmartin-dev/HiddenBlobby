@@ -4,6 +4,7 @@ using UnityEditor.UI;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
+using UnityEngine.Splines;
 
 public class PlayerController : MonoBehaviour
 {
@@ -11,6 +12,7 @@ public class PlayerController : MonoBehaviour
     private Transform model_transform;
     private Animator animator;
     private int is_moving_param_index;
+    private int speed_mod_param_index;
     private Camera cam;
     private Vector3 velocity;
     [SerializeField]
@@ -20,6 +22,11 @@ public class PlayerController : MonoBehaviour
     private float look_speed;
     public bool masked;
     [SerializeField] public List<EnemyController> chasing_enemies;
+    private Material grass_mat;
+    [SerializeField] private Vector2 peephole_origin;
+    private Vector2 peephole_target;
+    [SerializeField] private float peephole_min_size;
+    [SerializeField] private float max_lookahead;
     // Start is called before the first frame update
     void Start()
     {
@@ -28,6 +35,7 @@ public class PlayerController : MonoBehaviour
         model_transform = view_model.transform;
         animator = view_model.GetComponent<Animator>();
         is_moving_param_index = Animator.StringToHash("IsMoving");
+        speed_mod_param_index = Animator.StringToHash("speed_mod");
         cam = Camera.main;
         move_speed_mod = 1.0f;
 
@@ -38,6 +46,10 @@ public class PlayerController : MonoBehaviour
         // Start the player from the movable height, avoid jitter on first action
         controller.Move(new Vector3(0.01f, 0.0f, 0.0f));
         controller.Move(new Vector3(-0.01f, 0.0f, 0.0f));
+
+        grass_mat = GameObject.FindGameObjectWithTag("Hedge").GetComponent<Renderer>().sharedMaterial;
+        peephole_target = peephole_origin;
+        grass_mat.SetFloat("_Size", peephole_min_size);
     }
 
     public void OnMove(InputAction.CallbackContext context)
@@ -45,6 +57,13 @@ public class PlayerController : MonoBehaviour
         var input_value = context.ReadValue<Vector2>();
         velocity = new Vector3(input_value.x, 0.0f, input_value.y);
         if (velocity.magnitude > 1.0f) velocity = velocity.normalized;
+    }
+
+    public void OnPeepHole(InputAction.CallbackContext context)
+    {
+        var input_value = context.ReadValue<Vector2>();
+        if (input_value.magnitude > 1.0f) input_value = input_value.normalized;
+        peephole_target = peephole_origin + input_value * max_lookahead;
     }
 
     public void OnInteract(InputAction.CallbackContext context)
@@ -57,7 +76,7 @@ public class PlayerController : MonoBehaviour
             {
                 if (enemy.can_see_player) enemy.knows_player_masked = true;
             }
-            move_speed_mod = 0.1f;
+            move_speed_mod = 0.12f;
         }
         else
         {
@@ -98,10 +117,24 @@ public class PlayerController : MonoBehaviour
             Quaternion toRotation = Quaternion.LookRotation(velocity, Vector3.up);
             model_transform.rotation = Quaternion.Slerp(model_transform.rotation, toRotation, look_speed * Time.deltaTime);
             animator.SetBool(is_moving_param_index, true);
+            animator.SetFloat(speed_mod_param_index, move_speed_mod);
         }
         else
         {
             animator.SetBool(is_moving_param_index, false);
         }
+
+        grass_mat.SetVector("_PlayerScreenPos", Vector2.Lerp(grass_mat.GetVector("_PlayerScreenPos"), peephole_target, 0.5f));
+        if (peephole_target - peephole_origin != Vector2.zero)
+        {
+            grass_mat.SetFloat("_Size", Mathf.Lerp(grass_mat.GetFloat("_Size"), Mathf.Max((peephole_target - peephole_origin).magnitude * 3.0f, peephole_min_size), 0.2f));
+        }
+        else
+        {
+            grass_mat.SetFloat("_Size", Mathf.Lerp(grass_mat.GetFloat("_Size"), peephole_min_size, 0.2f));
+        }
+
+        if (masked) grass_mat.SetFloat("_Size", Mathf.Lerp(grass_mat.GetFloat("_Size"), 2.5f, 0.2f));
     }
+
 }

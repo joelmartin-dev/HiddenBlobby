@@ -9,6 +9,7 @@ TagManager:
   - Destination
   - Wall
   - Enemy
+  - Hedge
   layers:
   - Default
   - TransparentFX

@@ -8,8 +8,7 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: M_Hedge
-    second: {fileID: -876546973899608171, guid: 8e20cb8b1b58a8149809f0d518f84072,
-      type: 3}
+    second: {fileID: 2100000, guid: d78043181996f2643b986017df39b4fe, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

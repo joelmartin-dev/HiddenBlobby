@@ -1,14 +1,9 @@
 fileFormatVersion: 2
-guid: 52fccc7d181e3d340ad97196c871623c
+guid: 886d51c0f5b48cb468a370bcb39a4fbb
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects:
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: M_Hedge
-    second: {fileID: 2100000, guid: d78043181996f2643b986017df39b4fe, type: 2}
+  externalObjects: {}
   materials:
     materialImportMode: 2
     materialName: 0

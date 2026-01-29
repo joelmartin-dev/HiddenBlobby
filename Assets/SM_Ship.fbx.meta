@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 52fccc7d181e3d340ad97196c871623c
+guid: f84659c90fd484844b2dc01d54d72d36
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
@@ -7,8 +7,8 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: M_Hedge
-    second: {fileID: 2100000, guid: d78043181996f2643b986017df39b4fe, type: 2}
+      name: lambert2
+    second: {fileID: 2100000, guid: 124184ac206a47048af32a758e4c83c3, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
