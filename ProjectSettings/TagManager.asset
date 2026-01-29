@@ -11,6 +11,8 @@ TagManager:
   - Enemy
   - Hedge
   - Map
+  - Alert
+  - Question
   layers:
   - Default
   - TransparentFX

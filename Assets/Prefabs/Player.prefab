@@ -284,6 +284,10 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: 74d3a2d2-c468-4cf8-98be-3e36a240aeb1
     m_ActionName: Player/Cheat[/Keyboard/space]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 714c9350-e0dd-45ca-bbb8-996f9c776cfd
+    m_ActionName: Player/Cancel[/Keyboard/escape]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -360,6 +364,11 @@ PrefabInstance:
     - target: {fileID: 7986288336881732858, guid: 7cd9414b1e3a643408b88525b0e34e82,
         type: 3}
       propertyPath: m_CastShadows
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7986288336881732858, guid: 7cd9414b1e3a643408b88525b0e34e82,
+        type: 3}
+      propertyPath: m_DynamicOccludee
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7986288336881732858, guid: 7cd9414b1e3a643408b88525b0e34e82,

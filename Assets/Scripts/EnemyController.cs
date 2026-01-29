@@ -21,6 +21,8 @@ public class EnemyController : MonoBehaviour
     [SerializeField] private float wait_time;
     [SerializeField] private float max_held_time;
     [SerializeField] private float held_time;
+    private GameObject alert;
+    private GameObject question;
 
     // Start is called before the first frame update
     void Start()
@@ -57,6 +59,23 @@ public class EnemyController : MonoBehaviour
         }
 
         held_time = max_held_time;
+        var alerts = GameObject.FindGameObjectsWithTag("Alert");
+        foreach (var candidate in alerts)
+        {
+            if (candidate.transform.parent == transform)
+            {
+                alert = candidate; break;
+            }
+        }
+
+        var questions = GameObject.FindGameObjectsWithTag("Question");
+        foreach (var candidate in questions)
+        {
+            if (candidate.transform.parent == transform)
+            {
+                question = candidate; break;
+            }
+        }
     }
 
     public void DetectedPlayer()
@@ -94,11 +113,15 @@ public class EnemyController : MonoBehaviour
             }
             if (can_see_player)
             {
+                alert.transform.localScale = Vector3.Lerp(alert.transform.localScale, Vector3.one, 0.2f);
+                question.transform.localScale = Vector3.Lerp(question.transform.localScale, Vector3.zero, 0.2f);
                 agent.destination = player.transform.position;
                 wait_time = max_wait_time;
             }
             else
             {
+                alert.transform.localScale = Vector3.Lerp(alert.transform.localScale, Vector3.zero, 0.2f);
+                question.transform.localScale = Vector3.Lerp(question.transform.localScale, Vector3.one, 0.2f);
                 wait_time -= Time.fixedDeltaTime * frame_modulo;
                 if (wait_time < 0.0f)
                 {
@@ -107,10 +130,15 @@ public class EnemyController : MonoBehaviour
                 }
             }
         }
-        else if (agent.remainingDistance < 0.2f)
+        else
         {
-            agent.destination = to_point_a ? point_b : point_a;
-            to_point_a = !to_point_a;
+            alert.transform.localScale = Vector3.Lerp(alert.transform.localScale, Vector3.zero, 0.2f);
+            question.transform.localScale = Vector3.Lerp(question.transform.localScale, Vector3.zero, 0.2f);
+            if (agent.remainingDistance < 0.2f)
+            {
+                agent.destination = to_point_a ? point_b : point_a;
+                to_point_a = !to_point_a;
+            }
         }
     }
 }
